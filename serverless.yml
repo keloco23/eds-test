@@ -1,0 +1,61 @@
+service: eds-test
+
+provider:
+  name: aws
+  runtime: python3.9
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - "s3:ListBucket"
+            - "s3:GetObject"
+            - "s3:PutObject"
+            - "s3:CreateBucket"
+          Resource: "*"
+  region: us-east-1 
+
+functions:
+  getUf:
+    handler: functions/uf.get_uf
+    timeout: 120
+    events:
+      - http:
+          path: get-uf
+          method: post
+
+plugins:
+  - serverless-offline
+  - serverless-s3-local
+  - serverless-dynamodb-local
+
+custom:
+  s3:
+    host: localhost
+    port: 8001
+    directory: D:/prueba/eds-test/s3-storage
+    accessKeyId: S3RVER
+    secretAccessKey: S3RVER
+    
+
+  dynamodb:
+    start:
+      port: 8000
+      inMemory: true
+      heapInitial: 200m
+      heapMax: 1g
+      migrate: true
+    seed: true
+    convertEmptyValues: true
+
+  serverless-offline:
+    httpPort: 3000
+    lambdaPort: 3002
+    noPrependStageInUrl: true
+
+resources:
+  Resources:
+    LocalS3Bucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: local-bucket
