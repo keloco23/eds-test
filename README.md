@@ -1,82 +1,66 @@
-<!--
-title: 'AWS Python Example'
-description: 'This template demonstrates how to deploy a Python function running on AWS Lambda using the traditional Serverless Framework.'
-layout: Doc
-framework: v3
-platform: AWS
-language: python
-priority: 2
-authorLink: 'https://github.com/serverless'
-authorName: 'Serverless, inc.'
-authorAvatar: 'https://avatars1.githubusercontent.com/u/13742415?s=200&v=4'
--->
+Prueba eDarkStore
 
+Este proyecto implementa dos funciones Lambda utilizando el framework Serverless:
 
-# Serverless Framework AWS Python Example
+1. **Función Lambda para obtener la UF**: Una función POST que obtiene el valor de la UF y lo guarda en un archivo PDF dentro de un bucket en S3.
+2. **Función Lambda para obtener el valor del dólar (No implementada)**: Una función que debería ejecutarse con un schedule o cron para obtener el valor del dólar y guardarlo en DynamoDB. No se pudo implementar debido a problemas con el plugin de DynamoDB local.
 
-This template demonstrates how to deploy a Python function running on AWS Lambda using the traditional Serverless Framework. The deployed function does not include any event definitions as well as any kind of persistence (database). For more advanced configurations check out the [examples repo](https://github.com/serverless/examples/) which includes integrations with SQS, DynamoDB or examples of functions that are triggered in `cron`-like manner. For details about configuration of specific `events`, please refer to our [documentation](https://www.serverless.com/framework/docs/providers/aws/events/).
+## Requisitos
 
-## Usage
+- **Python**: Utilizado para ejecutar el proyecto.
+- **Serverless Framework v3**: Para la gestión de funciones Lambda.
+- **Plugins Serverless**:
+  - `serverless-offline`: Para ejecutar las funciones de forma local.
+  - `serverless-s3-local`: Para emular el servicio de S3 localmente.
+  - `serverless-dynamodb-local`: Para emular el servicio de DynamoDB localmente (hubo problemas con este plugin).
 
-### Deployment
+## Instalación
 
-In order to deploy the example, you need to run the following command:
-
-```
-$ serverless deploy
-```
-
-After running deploy, you should see output similar to:
+### 1. Clonar el repositorio
 
 ```bash
-Deploying aws-python-project to stage dev (us-east-1)
-
-✔ Service deployed to stack aws-python-project-dev (112s)
-
-functions:
-  hello: aws-python-project-dev-hello (1.5 kB)
+git clone https://github.com/keloco23/eds-test.git
+cd eds-test
 ```
 
-### Invocation
+### Instalar dependencias
 
-After successful deployment, you can invoke the deployed function by using the following command:
+No se encuentra la carpeta node_modules, por tanto es necesario instalar npm junto a sus dependencias
 
 ```bash
-serverless invoke --function hello
+npm install
 ```
 
-Which should result in response similar to the following:
+### Instalar plugins de Serverless
 
-```json
-{
-    "statusCode": 200,
-    "body": "{\"message\": \"Go Serverless v3.0! Your function executed successfully!\", \"input\": {}}"
-}
-```
+Instalar los siguientes plugins para la ejecución local:
 
-### Local development
-
-You can invoke your function locally by using the following command:
+- **serverless-offline**: Para ejecutar el proyecto localmente.
+- **serverless-s3-local**: Para emular S3 localmente.
+- **serverless-dynamodb-local** (No implementado por problemas en DynamoDB).
 
 ```bash
-serverless invoke local --function hello
+npm install serverless-offline --save-dev
+npm install serverless-s3-local --save-dev
+npm install serverless-dynamodb-local --save-dev
 ```
 
-Which should result in response similar to the following:
+### Configuración de `serverless.yml`
 
-```
-{
-    "statusCode": 200,
-    "body": "{\"message\": \"Go Serverless v3.0! Your function executed successfully!\", \"input\": {}}"
-}
-```
+El archivo `serverless.yml` ya está configurado con las funciones Lambda y los recursos necesarios para ejecutar el proyecto localmente.
 
-### Bundling dependencies
+### Iniciar proyecto localmente
 
-In case you would like to include third-party dependencies, you will need to use a plugin called `serverless-python-requirements`. You can set it up by running the following command:
+Para ejecutar las funciones Lambda localmente, utiliza el siguiente comando:
 
 ```bash
-serverless plugin install -n serverless-python-requirements
+npx sls offline start
 ```
 
-Running the above will automatically add `serverless-python-requirements` to `plugins` section in your `serverless.yml` file and add it as a `devDependency` to `package.json` file. The `package.json` file will be automatically created if it doesn't exist beforehand. Now you will be able to add your dependencies to `requirements.txt` file (`Pipfile` and `pyproject.toml` is also supported but requires additional configuration) and they will be automatically injected to Lambda package during build process. For more details about the plugin's configuration, please refer to [official documentation](https://github.com/UnitedIncome/serverless-python-requirements).
+### Función lambda UF
+
+Una vez que el proyecto esté corriendo localmente, puedes probar la función Lambda de la UF utilizando Postman. La función acepta una petición POST y guarda un archivo PDF con el valor de la UF en un bucket S3 local.
+
+### Función del Dólar (No implementada)
+
+La funcionalidad para obtener el valor del dólar y guardarlo en DynamoDB no fue implementada debido a problemas con el plugin de DynamoDB local. Sin embargo, hay codigo presente mostrando su estructura y lógica detras.

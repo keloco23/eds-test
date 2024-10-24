@@ -1,0 +1,7 @@
+{
+    "Table":{
+        "TableName":"usdTable",
+        "date":"timestamp",
+        "value":"float"
+    }
+}

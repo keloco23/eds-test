@@ -14,6 +14,19 @@ provider:
             - "s3:CreateBucket"
           Resource: "*"
   region: us-east-1 
+  environment:
+    USD_TABLE: usdTable
+  iamRoleStatements:
+    - Effect: "Allow"
+      Action:
+        - "dynamodb:DescribeTable"
+        - "dynamodb:Query"
+        - "dynamodb:Scan"
+        - "dynamodb:GetItem"
+        - "dynamodb:PutItem"
+        - "dynamodb:UpdateItem"
+        - "dynamodb:DeleteItem"
+      Resource: "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.USD_TABLE}"
 
 functions:
   getUf:
@@ -23,11 +36,18 @@ functions:
       - http:
           path: get-uf
           method: post
+  getUSD:
+    handler: functions/usd.get_usd
+    timeout: 120
+    events:
+      - http:
+          path: get-usd
+          method: get       
 
 plugins:
   - serverless-offline
   - serverless-s3-local
-  - serverless-dynamodb-local
+  #- serverless-dynamodb
 
 custom:
   s3:
@@ -36,18 +56,7 @@ custom:
     directory: D:/prueba/eds-test/s3-storage
     accessKeyId: S3RVER
     secretAccessKey: S3RVER
-    
-
-  dynamodb:
-    start:
-      port: 8000
-      inMemory: true
-      heapInitial: 200m
-      heapMax: 1g
-      migrate: true
-    seed: true
-    convertEmptyValues: true
-
+         
   serverless-offline:
     httpPort: 3000
     lambdaPort: 3002

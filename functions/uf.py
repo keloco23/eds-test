@@ -5,16 +5,16 @@ import boto3
 import logging
 from datetime import datetime
 
-# Configurar logging
+#logs
 logging.basicConfig(level=logging.INFO)
 
 def get_uf(event, context):
     logging.info("Inicio de la función Lambda.")
     
-    # URL para obtener el valor de la UF
+    # API url
     uf_url = 'https://mindicador.cl/api/uf'
     try:
-        response = requests.get(uf_url, timeout=120)  # Timeout de 10 segundos
+        response = requests.get(uf_url, timeout=120) 
         logging.info("Solicitud a mindicador exitosa.")
     except requests.exceptions.Timeout:
         logging.error("Timeout al conectar con mindicador.cl")
@@ -26,7 +26,7 @@ def get_uf(event, context):
     uf = response.json()
     uf_value = uf['serie'][0]['valor']
     
-    # Crear un archivo PDF con el valor de la UF
+    #PDF
     logging.info(f"Valor de la UF recibido: {uf_value}")
     pdf = FPDF()
     pdf.add_page()
@@ -34,23 +34,23 @@ def get_uf(event, context):
     pdf.cell(200, 10, txt=f"El valor de la UF es: {uf_value}", ln=True, align='C')
     
     timestamp = datetime.now().strftime("%Y-%m-%d-%H.%M.%S")
-    pdf_filename = f"./s3-storage/uf_{timestamp}.pdf"  # Guardar el PDF en un directorio temporal
+    pdf_filename = f"./s3-storage/uf_{timestamp}.pdf" 
     pdf.output(pdf_filename)
     logging.info(f"Archivo PDF generado en {pdf_filename}")
     
-    # Crear una sesión de boto3 para interactuar con S3
+    # SESSION S3 WITH BOTO3
     session = boto3.Session(
         aws_access_key_id='S3RVER',
         aws_secret_access_key='S3RVER'
     )
 
-    # Conectar con el servicio S3 (endpoint local para S3 local)
+    # S3 LOCAL
     s3 = session.client(
         's3',
         endpoint_url=os.getenv('S3_ENDPOINT_URL', 'http://localhost:8001')
     )
     
-    # Nombre del bucket
+    # BUCKET
     bucket_name = os.getenv('S3_BUCKET', 'local-bucket')
     
     try:
